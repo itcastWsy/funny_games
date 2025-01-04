@@ -7,7 +7,7 @@ export default defineConfig({
     host: true,
   },
   build: {
-    outDir: "build",
+    outDir: "dist",
   },
-  base: '/funny_games/',
+  base: '/funny_games/dist',
 });
