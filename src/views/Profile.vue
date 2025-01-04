@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { validateAuth, register, login } from '../utils/authUtils';
-import { getGameSummaries } from '../utils/gameUtils';
+import { getGameSummaries, initializeGameData } from '../utils/gameUtils';
 import { useIntervalFn } from '@vueuse/core';
 import { useUserStore } from '../stores/user';
 import type { GameSummary } from '@/types/game';
@@ -182,16 +182,6 @@ const handleLogout = () => {
     averageScore: 0
   }));
   showToast('已退出登录');
-};
-
-const initializeGameData = (username: string) => {
-  // 如果用户是首次登录，初始化游戏数据
-  if (!localStorage.getItem(`${username}_reactionScores`)) {
-    localStorage.setItem(`${username}_reactionScores`, '[]');
-  }
-  if (!localStorage.getItem(`${username}_bubblePopScores`)) {
-    localStorage.setItem(`${username}_bubblePopScores`, '[]');
-  }
 };
 
 const loadUserData = () => {

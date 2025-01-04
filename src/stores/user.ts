@@ -22,8 +22,8 @@ export const useUserStore = defineStore('user', {
     },
     
     loadGameRecords() {
-      const reactionScores = JSON.parse(localStorage.getItem('reactionScores') || '[]');
-      const bubblePopScores = JSON.parse(localStorage.getItem('bubblePopScores') || '[]');
+      const reactionScores = JSON.parse(localStorage.getItem(`${this.username}_reactionScores`) || '[]');
+      const bubblePopScores = JSON.parse(localStorage.getItem(`${this.username}_bubblePopScores`) || '[]');
       
       this.gameRecords = [
         ...reactionScores.map((score: number) => ({

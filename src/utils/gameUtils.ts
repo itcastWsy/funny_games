@@ -6,13 +6,6 @@ interface GameScore {
   date: string;
 }
 
-interface GameSummary {
-  gameName: string;
-  bestScore: number;
-  totalGames: number;
-  averageScore: number;
-}
-
 export const getRating = (time: number): string => {
   if (time < 200) return '神级反应!';
   if (time < 300) return '超快!';
@@ -86,7 +79,7 @@ export function saveGameScore(username: string, gameName: string, score: number)
   localStorage.setItem(key, JSON.stringify(scores));
 }
 
-const initializeGameData = (username: string) => {
+export function initializeGameData(username: string): void {
   // 如果用户是首次登录，初始化所有游戏数据
   const games = ['reaction', 'bubblePop', 'memoryCards', 'colorMatch'];
   games.forEach(game => {
@@ -95,4 +88,4 @@ const initializeGameData = (username: string) => {
       localStorage.setItem(key, '[]');
     }
   });
-};
+}
