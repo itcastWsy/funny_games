@@ -81,14 +81,42 @@ import { ref, onMounted } from 'vue';
 import { validateAuth, register, login } from '../utils/authUtils';
 import { getGameSummaries } from '../utils/gameUtils';
 import { useIntervalFn } from '@vueuse/core';
+import { useUserStore } from '../stores/user';
 import type { GameSummary } from '@/types/game';
 import type { FieldRule } from 'vant';
+import { showToast } from 'vant';
 
+const userStore = useUserStore();
 const isLoggedIn = ref(false);
 const isRegistering = ref(false);
 const username = ref('');
 const password = ref('');
-const gameSummaries = ref<GameSummary[]>([]);
+const gameSummaries = ref<GameSummary[]>([
+  {
+    gameName: '反应测试',
+    bestScore: 0,
+    totalGames: 0,
+    averageScore: 0
+  },
+  {
+    gameName: '泡泡爆破',
+    bestScore: 0,
+    totalGames: 0,
+    averageScore: 0
+  },
+  {
+    gameName: '记忆翻牌',
+    bestScore: 0,
+    totalGames: 0,
+    averageScore: 0
+  },
+  {
+    gameName: '颜色匹配',
+    bestScore: 0,
+    totalGames: 0,
+    averageScore: 0
+  }
+]);
 
 const defaultAvatar = 'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg';
 
@@ -102,28 +130,68 @@ const passwordRules: FieldRule[] = [
   { pattern: /.{6,}/, message: '密码不能少于6位' }
 ];
 
-const onSubmit = (values: any) => {
+const onSubmit = async (values: any) => {
   const error = validateAuth(values.username, values.password);
   if (error) {
+    showToast(error);
     return;
   }
 
-  const success = isRegistering.value
-    ? register(values)
-    : login(values);
+  try {
+    if (isRegistering.value) {
+      // 注册逻辑
+      const success = register(values);
+      if (success) {
+        showToast('注册成功');
+        // 注册成功后自动登录
+        await handleLogin(values);
+      }
+    } else {
+      // 登录逻辑
+      await handleLogin(values);
+    }
+  } catch (err) {
+    showToast(err instanceof Error ? err.message : '操作失败');
+  }
+};
 
+const handleLogin = async (values: any) => {
+  const success = login(values);
   if (success) {
     isLoggedIn.value = true;
     userInfo.value.username = values.username;
+    userStore.login(values.username);
+    // 初始化游戏数据
+    initializeGameData(values.username);
+    showToast('登录成功');
     loadUserData();
+  } else {
+    throw new Error('登录失败');
   }
 };
 
 const handleLogout = () => {
   localStorage.removeItem('currentUser');
+  userStore.logout();
   isLoggedIn.value = false;
   userInfo.value.username = '';
-  gameSummaries.value = [];
+  gameSummaries.value = gameSummaries.value.map(summary => ({
+    ...summary,
+    bestScore: 0,
+    totalGames: 0,
+    averageScore: 0
+  }));
+  showToast('已退出登录');
+};
+
+const initializeGameData = (username: string) => {
+  // 如果用户是首次登录，初始化游戏数据
+  if (!localStorage.getItem(`${username}_reactionScores`)) {
+    localStorage.setItem(`${username}_reactionScores`, '[]');
+  }
+  if (!localStorage.getItem(`${username}_bubblePopScores`)) {
+    localStorage.setItem(`${username}_bubblePopScores`, '[]');
+  }
 };
 
 const loadUserData = () => {
@@ -131,6 +199,7 @@ const loadUserData = () => {
   if (currentUser) {
     isLoggedIn.value = true;
     userInfo.value.username = currentUser;
+    userStore.login(currentUser);
     gameSummaries.value = getGameSummaries(currentUser);
   }
 };

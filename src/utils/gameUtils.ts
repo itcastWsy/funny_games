@@ -1,4 +1,5 @@
 import { showSuccessToast } from 'vant';
+import type { GameSummary } from '@/types/game';
 
 interface GameScore {
   score: number;
@@ -36,29 +37,62 @@ export const updateGameStats = (gameName: string, score: number): void => {
   showSuccessToast('成绩已保存');
 };
 
-export const getGameSummaries = (username: string): GameSummary[] => {
-  const games = ['反应测试', '泡泡爆破', '记忆翻牌', '颜色匹配'];
-  
-  return games.map(gameName => {
-    const key = `${username}_${gameName.toLowerCase()}_scores`;
-    const scores: GameScore[] = JSON.parse(localStorage.getItem(key) || '[]');
-    
-    if (scores.length === 0) {
-      return {
-        gameName,
-        bestScore: 0,
-        totalGames: 0,
-        averageScore: 0
-      };
-    }
+export function getGameSummaries(username: string): GameSummary[] {
+  const reactionScores = JSON.parse(localStorage.getItem(`${username}_reactionScores`) || '[]');
+  const bubblePopScores = JSON.parse(localStorage.getItem(`${username}_bubblePopScores`) || '[]');
+  const memoryCardsScores = JSON.parse(localStorage.getItem(`${username}_memoryCardsScores`) || '[]');
+  const colorMatchScores = JSON.parse(localStorage.getItem(`${username}_colorMatchScores`) || '[]');
 
-    const allScores = scores.map(s => s.score);
-    
-    return {
-      gameName,
-      bestScore: Math.min(...allScores),
-      totalGames: scores.length,
-      averageScore: Math.round(allScores.reduce((a, b) => a + b, 0) / scores.length)
-    };
+  return [
+    {
+      gameName: '反应测试',
+      bestScore: reactionScores.length > 0 ? Math.min(...reactionScores) : 0,
+      totalGames: reactionScores.length,
+      averageScore: reactionScores.length > 0 
+        ? Math.round(reactionScores.reduce((a: number, b: number) => a + b, 0) / reactionScores.length) 
+        : 0
+    },
+    {
+      gameName: '泡泡爆破',
+      bestScore: bubblePopScores.length > 0 ? Math.max(...bubblePopScores) : 0,
+      totalGames: bubblePopScores.length,
+      averageScore: bubblePopScores.length > 0 
+        ? Math.round(bubblePopScores.reduce((a: number, b: number) => a + b, 0) / bubblePopScores.length) 
+        : 0
+    },
+    {
+      gameName: '记忆翻牌',
+      bestScore: memoryCardsScores.length > 0 ? Math.max(...memoryCardsScores) : 0,
+      totalGames: memoryCardsScores.length,
+      averageScore: memoryCardsScores.length > 0 
+        ? Math.round(memoryCardsScores.reduce((a: number, b: number) => a + b, 0) / memoryCardsScores.length) 
+        : 0
+    },
+    {
+      gameName: '颜色匹配',
+      bestScore: colorMatchScores.length > 0 ? Math.max(...colorMatchScores) : 0,
+      totalGames: colorMatchScores.length,
+      averageScore: colorMatchScores.length > 0 
+        ? Math.round(colorMatchScores.reduce((a: number, b: number) => a + b, 0) / colorMatchScores.length) 
+        : 0
+    }
+  ];
+}
+
+export function saveGameScore(username: string, gameName: string, score: number): void {
+  const key = `${username}_${gameName}Scores`;
+  const scores = JSON.parse(localStorage.getItem(key) || '[]');
+  scores.push(score);
+  localStorage.setItem(key, JSON.stringify(scores));
+}
+
+const initializeGameData = (username: string) => {
+  // 如果用户是首次登录，初始化所有游戏数据
+  const games = ['reaction', 'bubblePop', 'memoryCards', 'colorMatch'];
+  games.forEach(game => {
+    const key = `${username}_${game}Scores`;
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, '[]');
+    }
   });
 };
