@@ -9,5 +9,5 @@ export default defineConfig({
   build: {
     outDir: "dist",
   },
-  base: '/funny_games/dist',
+  base: '/funny_games/',
 });
