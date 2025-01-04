@@ -26,40 +26,56 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const games = ref([
+const router = useRouter();
+
+interface Game {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  route: string;
+  path: string;
+}
+
+const games = ref<Game[]>([
   {
     id: 1,
     name: '反应测试',
     description: '测试你的反应速度！',
     icon: 'fire',
-    route: '/games/reaction'
+    route: '/games/reaction',
+    path: '/games/reaction'
   },
   {
     id: 2,
     name: '泡泡爆破',
     description: '点击泡泡，获得高分！',
     icon: 'cluster-o',
-    route: '/games/bubble-pop'
+    route: '/games/bubble-pop',
+    path: '/games/bubble-pop'
   },
   {
     id: 3,
     name: '记忆翻牌',
     description: '考验你的记忆力！',
     icon: 'apps-o',
-    route: '/games/memory-cards'
+    route: '/games/memory-cards',
+    path: '/games/memory-cards'
   },
   {
     id: 4,
     name: '颜色匹配',
     description: '快速判断颜色是否匹配！',
     icon: 'gem-o',
-    route: '/games/color-match'
+    route: '/games/color-match',
+    path: '/games/color-match'
   }
 ]);
 
-const handleGameClick = (game: any) => {
-  // Additional handling if needed
+const handleGameClick = (game: Game) => {
+  router.push(game.path);
 };
 </script>
 

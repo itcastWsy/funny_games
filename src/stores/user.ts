@@ -1,25 +1,23 @@
 import { defineStore } from 'pinia';
+import type { GameRecord } from '@/types/game';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
+    username: '',
     isLoggedIn: false,
-    userInfo: {
-      username: '',
-      avatar: ''
-    },
-    gameRecords: []
+    gameRecords: [] as GameRecord[]
   }),
   
   actions: {
     login(username: string) {
       this.isLoggedIn = true;
-      this.userInfo.username = username;
+      this.username = username;
       this.loadGameRecords();
     },
     
     logout() {
       this.isLoggedIn = false;
-      this.userInfo.username = '';
+      this.username = '';
       this.gameRecords = [];
     },
     
@@ -30,11 +28,13 @@ export const useUserStore = defineStore('user', {
       this.gameRecords = [
         ...reactionScores.map((score: number) => ({
           gameName: '反应测试',
-          score
+          score,
+          timestamp: Date.now()
         })),
         ...bubblePopScores.map((score: number) => ({
           gameName: '泡泡爆破',
-          score
+          score,
+          timestamp: Date.now()
         }))
       ].sort((a, b) => b.score - a.score);
     }

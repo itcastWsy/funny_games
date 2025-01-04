@@ -54,10 +54,7 @@
               name="password"
               label="密码"
               placeholder="请输入密码(不少于6位)"
-              :rules="[
-                { required: true, message: '请填写密码' },
-                { min: 6, message: '密码不能少于6位' }
-              ]"
+              :rules="passwordRules"
             />
           </van-cell-group>
           <div class="submit-btn">
@@ -84,12 +81,14 @@ import { ref, onMounted } from 'vue';
 import { validateAuth, register, login } from '../utils/authUtils';
 import { getGameSummaries } from '../utils/gameUtils';
 import { useIntervalFn } from '@vueuse/core';
+import type { GameSummary } from '@/types/game';
+import type { FieldRule } from 'vant';
 
 const isLoggedIn = ref(false);
 const isRegistering = ref(false);
 const username = ref('');
 const password = ref('');
-const gameSummaries = ref([]);
+const gameSummaries = ref<GameSummary[]>([]);
 
 const defaultAvatar = 'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg';
 
@@ -97,6 +96,11 @@ const userInfo = ref({
   username: '',
   avatar: defaultAvatar
 });
+
+const passwordRules: FieldRule[] = [
+  { required: true, message: '请输入密码' },
+  { pattern: /.{6,}/, message: '密码不能少于6位' }
+];
 
 const onSubmit = (values: any) => {
   const error = validateAuth(values.username, values.password);

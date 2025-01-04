@@ -10,7 +10,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 
 const activeTab = ref(0);
 </script>

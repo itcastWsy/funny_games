@@ -7,7 +7,7 @@ import MemoryCards from '../views/games/MemoryCards.vue';
 import ColorMatch from '../views/games/ColorMatch.vue';
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/funny_games/'),
   routes: [
     {
       path: '/',
